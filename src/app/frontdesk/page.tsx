@@ -1,4 +1,6 @@
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
+
 
 // Define types
 type AppointmentType = 'Consultation' | 'Follow-up' | 'Check-up' | 'Emergency';
