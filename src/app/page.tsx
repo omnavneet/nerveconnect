@@ -1,9 +1,46 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Mic, Brain, Clock, Shield, TrendingUp, Users } from 'lucide-react';
+import { Mic, Brain, Clock, Shield, TrendingUp, Users, Heart, Activity } from 'lucide-react';
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ResponsiveContainer } from 'recharts';
 import Head from 'next/head';
 
-const MediCarePro = () => {
+interface PricingPlanFeature {
+  text: string;
+  included: boolean;
+}
+
+interface PricingPlan {
+  name: string;
+  description: string;
+  price: string;
+  period: string;
+  features: (string | PricingPlanFeature)[];
+  featured: boolean;
+  buttonText: string;
+}
+
+interface Testimonial {
+  initials: string;
+  name: string;
+  role: string;
+  quote: string;
+  stars: number;
+}
+
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+  items: string[];
+}
+
+export default function MediCarePro() {
+  // State management
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
@@ -18,11 +55,54 @@ const MediCarePro = () => {
     email: false,
     message: false
   });
+  const [animatedValues, setAnimatedValues] = useState({
+    providers: 0,
+    patients: 0,
+    uptime: 0,
+    support: 0
+  });
 
+  // Refs
   const navRef = useRef<HTMLElement>(null);
   const statsSectionRef = useRef<HTMLDivElement>(null);
   const countersRef = useRef<NodeListOf<Element>>();
 
+  // Animation function
+  const animateCounters = () => {
+    const targets = {
+      providers: 500,
+      patients: 25000,
+      uptime: 99.9,
+      support: 24
+    };
+
+    const duration = 2000;
+    const steps = 60;
+    const stepDuration = duration / steps;
+
+    let currentStep = 0;
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+
+      setAnimatedValues({
+        providers: Math.floor(targets.providers * easeOutProgress),
+        patients: Math.floor(targets.patients * easeOutProgress),
+        uptime: +(targets.uptime * easeOutProgress).toFixed(1),
+        support: Math.floor(targets.support * easeOutProgress)
+      });
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        setAnimatedValues(targets);
+      }
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  };
+
+  // Effects
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
@@ -45,24 +125,7 @@ const MediCarePro = () => {
       }
     };
 
-    // Counter animation
-    const animateCounters = () => {
-      countersRef.current?.forEach(counter => {
-        const target = +(counter.getAttribute('data-target') || 0);
-        const count = +(counter.textContent || 0);
-        const increment = target / 200;
-        
-        if (count < target) {
-          counter.textContent = Math.ceil(count + increment).toString();
-          requestAnimationFrame(animateCounters);
-        } else {
-          counter.textContent = target.toString();
-          if (target % 1 !== 0) {
-            counter.textContent = target.toFixed(1);
-          }
-        }
-      });
-    };
+    window.addEventListener('scroll', handleScroll);
 
     // Intersection Observer for counters
     const statsObserver = new IntersectionObserver((entries) => {
@@ -78,8 +141,6 @@ const MediCarePro = () => {
       statsObserver.observe(statsSectionRef.current);
     }
 
-    window.addEventListener('scroll', handleScroll);
-
     return () => {
       clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
@@ -87,6 +148,7 @@ const MediCarePro = () => {
     };
   }, []);
 
+  // Helper functions
   const toggleAccordion = (index: number) => {
     setActiveAccordion(activeAccordion === index ? null : index);
   };
@@ -116,7 +178,6 @@ const MediCarePro = () => {
     setFormErrors(errors);
     
     if (!Object.values(errors).some(error => error)) {
-      // Here you would typically send the form data to a server
       alert('Thank you for your message! We will get back to you soon.');
       setFormData({
         name: '',
@@ -161,7 +222,8 @@ const MediCarePro = () => {
     }
   };
 
-  const faqs = [
+  // Data arrays
+  const faqs: FAQ[] = [
     {
       question: "Is MediCare Pro HIPAA compliant?",
       answer: "Yes, MediCare Pro is fully HIPAA compliant. We implement industry-standard security measures including data encryption, access controls, audit logs, and regular security audits to ensure all protected health information (PHI) is secure."
@@ -184,7 +246,7 @@ const MediCarePro = () => {
     }
   ];
 
-  const features = [
+  const features: Feature[] = [
     {
       icon: "🏥",
       title: "Doctor Dashboard",
@@ -253,7 +315,7 @@ const MediCarePro = () => {
     }
   ];
 
-  const testimonials = [
+  const testimonials: Testimonial[] = [
     {
       initials: "JD",
       name: "Dr. John Doe",
@@ -277,7 +339,7 @@ const MediCarePro = () => {
     }
   ];
 
-  const pricingPlans = [
+  const pricingPlans: PricingPlan[] = [
     {
       name: "Basic",
       description: "Perfect for small practices",
@@ -438,20 +500,19 @@ const MediCarePro = () => {
         <section id="home" className="min-h-screen bg-gradient-to-r from-blue-600 to-teal-500 relative flex items-center justify-center overflow-hidden">
           {/* Animated particles background */}
           <div className="absolute inset-0 overflow-hidden">
-           {[...Array(5)].map((_, i) => (
-  <div 
-    key={i}
-    className="absolute rounded-full bg-white/10"
-    style={{
-      top: `${[20, 70, 40, 60, 30][i]}%`,
-      left: `${[15, 80, 50, 30, 70][i]}%`,
-      width: `${[8, 12, 6, 10, 8][i]}px`,
-      height: `${[8, 12, 6, 10, 8][i]}px`,
-      // Use fixed values instead of Math.random()
-      animation: `float ${[10, 15, 12, 14, 11][i]}s ease-in-out ${[1, 2, 3, 2, 1][i]}s infinite`
-    }}
-  ></div>
-))}
+            {[...Array(5)].map((_, i) => (
+              <div 
+                key={i}
+                className="absolute rounded-full bg-white/10"
+                style={{
+                  top: `${[20, 70, 40, 60, 30][i]}%`,
+                  left: `${[15, 80, 50, 30, 70][i]}%`,
+                  width: `${[8, 12, 6, 10, 8][i]}px`,
+                  height: `${[8, 12, 6, 10, 8][i]}px`,
+                  animation: `float ${[10, 15, 12, 14, 11][i]}s ease-in-out ${[1, 2, 3, 2, 1][i]}s infinite`
+                }}
+              ></div>
+            ))}
           </div>
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -496,102 +557,86 @@ const MediCarePro = () => {
           </div>
         </section>
 
-
-
-
-
-
-
-
         {/* Trusted By Section */}
-    <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
-  <div className="max-w-7xl mx-auto px-6">
-    {/* Header */}
-    <div className="text-center mb-16">
-      <h2 className="text-4xl font-bold text-gray-900 mb-4">
-        Why Choose Our AI-Powered Clinic Management System?
-      </h2>
-      <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-        Experience the future of healthcare management with intelligent automation that adapts to your practice
-      </p>
-    </div>
-
-    {/* Features Grid */}
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {[
-        {
-          icon: <Mic className="w-8 h-8 text-blue-600" />,
-          title: "Voice-Powered Efficiency",
-          description: "Transform appointment booking with our advanced speech-to-text system. No more typing - just speak naturally and watch appointments get scheduled instantly.",
-          highlight: "50% faster booking process"
-        },
-        {
-          icon: <Brain className="w-8 h-8 text-purple-600" />,
-          title: "AI That Learns Your Style",
-          description: "Our intelligent prescription generator adapts to each doctor's preferences, creating personalized recommendations that align with your clinical expertise.",
-          highlight: "Continuously improving accuracy"
-        },
-        {
-          icon: <Clock className="w-8 h-8 text-green-600" />,
-          title: "Real-Time Synchronization",
-          description: "Instant updates across all platforms. When an appointment is booked, your dashboard updates immediately - no delays, no confusion.",
-          highlight: "Zero lag time"
-        },
-        {
-          icon: <Shield className="w-8 h-8 text-red-600" />,
-          title: "Secure Central Hub",
-          description: "Our MCP server acts as your intelligent backbone, managing all clinic data with enterprise-level security and seamless integration.",
-          highlight: "100% HIPAA compliant"
-        },
-        {
-          icon: <TrendingUp className="w-8 h-8 text-orange-600" />,
-          title: "Adaptive Intelligence",
-          description: "The system evolves with every interaction, building smarter recommendations based on successful prescriptions and treatment outcomes.",
-          highlight: "Self-improving algorithms"
-        },
-        {
-          icon: <Users className="w-8 h-8 text-teal-600" />,
-          title: "Streamlined Workflows",
-          description: "From voice booking to AI prescriptions, we eliminate administrative burden so you can focus on what matters most - patient care.",
-          highlight: "Reduced admin time by 60%"
-        }
-      ].map((feature, index) => (
-        <div
-          key={index}
-          className="group bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200"
-        >
-          <div className="flex items-center mb-4">
-            <div className="p-3 bg-gray-50 rounded-lg group-hover:bg-blue-50 transition-colors duration-300">
-              {feature.icon}
+        <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+          <div className="max-w-7xl mx-auto px-6">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Why Choose Our AI-Powered Clinic Management System?
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Experience the future of healthcare management with intelligent automation that adapts to your practice
+              </p>
             </div>
-            <div className="ml-4">
-              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
-                {feature.highlight}
-              </span>
+
+            {/* Features Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: <Mic className="w-8 h-8 text-blue-600" />,
+                  title: "Voice-Powered Efficiency",
+                  description: "Transform appointment booking with our advanced speech-to-text system. No more typing - just speak naturally and watch appointments get scheduled instantly.",
+                  highlight: "50% faster booking process"
+                },
+                {
+                  icon: <Brain className="w-8 h-8 text-purple-600" />,
+                  title: "AI That Learns Your Style",
+                  description: "Our intelligent prescription generator adapts to each doctor's preferences, creating personalized recommendations that align with your clinical expertise.",
+                  highlight: "Continuously improving accuracy"
+                },
+                {
+                  icon: <Clock className="w-8 h-8 text-green-600" />,
+                  title: "Real-Time Synchronization",
+                  description: "Instant updates across all platforms. When an appointment is booked, your dashboard updates immediately - no delays, no confusion.",
+                  highlight: "Zero lag time"
+                },
+                {
+                  icon: <Shield className="w-8 h-8 text-red-600" />,
+                  title: "Secure Central Hub",
+                  description: "Our MCP server acts as your intelligent backbone, managing all clinic data with enterprise-level security and seamless integration.",
+                  highlight: "100% HIPAA compliant"
+                },
+                {
+                  icon: <TrendingUp className="w-8 h-8 text-orange-600" />,
+                  title: "Adaptive Intelligence",
+                  description: "The system evolves with every interaction, building smarter recommendations based on successful prescriptions and treatment outcomes.",
+                  highlight: "Self-improving algorithms"
+                },
+                {
+                  icon: <Users className="w-8 h-8 text-teal-600" />,
+                  title: "Streamlined Workflows",
+                  description: "From voice booking to AI prescriptions, we eliminate administrative burden so you can focus on what matters most - patient care.",
+                  highlight: "Reduced admin time by 60%"
+                }
+              ].map((feature, index) => (
+                <div
+                  key={index}
+                  className="group bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="p-3 bg-gray-50 rounded-lg group-hover:bg-blue-50 transition-colors duration-300">
+                      {feature.icon}
+                    </div>
+                    <div className="ml-4">
+                      <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
+                        {feature.highlight}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {feature.title}
+                  </h3>
+                  
+                  <p className="text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-          
-          <h3 className="text-xl font-bold text-gray-900 mb-3">
-            {feature.title}
-          </h3>
-          
-          <p className="text-gray-600 leading-relaxed">
-            {feature.description}
-          </p>
-        </div>
-      ))}
-    </div>
-
-
-  </div>
-</section>
-
-
-
-
-
-
-
+        </section>
 
         {/* Features Section */}
         <section id="features" className="py-20 bg-gray-50">
@@ -681,57 +726,205 @@ const MediCarePro = () => {
           </div>
         </section>
 
-
-
-
-
-
-
-
-
-
-
-
         {/* Stats Section */}
         <section 
           ref={statsSectionRef}
-          className="py-20 bg-gradient-to-r from-blue-600 to-teal-600 text-white"
+          className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-teal-900 relative overflow-hidden"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-5xl font-bold mb-2 counter" data-target="500">0</div>
-                <div className="text-xl font-medium">Healthcare Providers</div>
+          {/* Animated background elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+            <div className="absolute top-40 right-10 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+            <div className="absolute bottom-10 left-1/2 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
+          </div>
+
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent">
+                Healthcare Impact at Scale
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Transforming healthcare delivery through cutting-edge technology and unwavering commitment to excellence
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Healthcare Providers Card */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 p-6 shadow-2xl transform transition-all duration-500 hover:scale-105 hover:shadow-3xl">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white bg-opacity-10 -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <Users className="w-8 h-8 text-white opacity-80" />
+                    <div className="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {animatedValues.providers}+
+                  </div>
+                  <div className="text-lg font-medium text-white opacity-90 mb-4">
+                    Healthcare Providers
+                  </div>
+                  <div className="h-24 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={[
+                        { month: 'Jan', count: 320 },
+                        { month: 'Feb', count: 380 },
+                        { month: 'Mar', count: 420 },
+                        { month: 'Apr', count: 450 },
+                        { month: 'May', count: 480 },
+                        { month: 'Jun', count: 500 }
+                      ]}>
+                        <Area 
+                          type="monotone" 
+                          dataKey="count" 
+                          stroke="#60A5FA" 
+                          fill="rgba(96, 165, 250, 0.3)"
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-5xl font-bold mb-2 counter" data-target="25000">0</div>
-                <div className="text-xl font-medium">Patients Served</div>
+
+              {/* Patients Served Card */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 to-green-700 p-6 shadow-2xl transform transition-all duration-500 hover:scale-105 hover:shadow-3xl">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white bg-opacity-10 -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <Heart className="w-8 h-8 text-white opacity-80" />
+                    <div className="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {animatedValues.patients.toLocaleString()}+
+                  </div>
+                  <div className="text-lg font-medium text-white opacity-90 mb-4">
+                    Patients Served
+                  </div>
+                  <div className="h-24 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={[
+                        { month: 'Jan', patients: 15000 },
+                        { month: 'Feb', patients: 18000 },
+                        { month: 'Mar', patients: 20000 },
+                        { month: 'Apr', patients: 22000 },
+                        { month: 'May', patients: 24000 },
+                        { month: 'Jun', patients: 25000 }
+                      ]}>
+                        <Line 
+                          type="monotone" 
+                          dataKey="patients" 
+                          stroke="#34D399" 
+                          strokeWidth={3}
+                          dot={{ fill: '#34D399', r: 3 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-5xl font-bold mb-2 counter" data-target="99.9">0</div>
-                <div className="text-xl font-medium">System Uptime</div>
+
+              {/* System Uptime Card */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600 to-emerald-700 p-6 shadow-2xl transform transition-all duration-500 hover:scale-105 hover:shadow-3xl">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white bg-opacity-10 -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <Shield className="w-8 h-8 text-white opacity-80" />
+                    <div className="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {animatedValues.uptime}%
+                  </div>
+                  <div className="text-lg font-medium text-white opacity-90 mb-4">
+                    System Uptime
+                  </div>
+                  <div className="h-24 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'Uptime', value: 99.9, color: '#10B981' },
+                            { name: 'Downtime', value: 0.1, color: '#EF4444' }
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={20}
+                          outerRadius={40}
+                          dataKey="value"
+                        >
+                          <Cell fill="#10B981" />
+                          <Cell fill="#EF4444" />
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-5xl font-bold mb-2 counter" data-target="24">0</div>
-                <div className="text-xl font-medium">Support Hours</div>
+
+              {/* Support Hours Card */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 p-6 shadow-2xl transform transition-all duration-500 hover:scale-105 hover:shadow-3xl">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white bg-opacity-10 -mr-16 -mt-16"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <Clock className="w-8 h-8 text-white opacity-80" />
+                    <div className="w-12 h-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {animatedValues.support}/7
+                  </div>
+                  <div className="text-lg font-medium text-white opacity-90 mb-4">
+                    Support Hours
+                  </div>
+                  <div className="h-24 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[
+                        { hour: '00:00', tickets: 12 },
+                        { hour: '06:00', tickets: 8 },
+                        { hour: '12:00', tickets: 25 },
+                        { hour: '18:00', tickets: 18 },
+                        { hour: '24:00', tickets: 15 }
+                      ]}>
+                        <Bar 
+                          dataKey="tickets" 
+                          fill="rgba(168, 85, 247, 0.8)"
+                          radius={[2, 2, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional metrics row */}
+            <div className="mt-16 grid md:grid-cols-3 gap-8">
+              <div className="text-center p-6 rounded-xl bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-20">
+                <Activity className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                <div className="text-3xl font-bold text-white mb-2">98.5%</div>
+                <div className="text-gray-300">Patient Satisfaction</div>
+              </div>
+              
+              <div className="text-center p-6 rounded-xl bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-20">
+                <TrendingUp className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                <div className="text-3xl font-bold text-white mb-2">45%</div>
+                <div className="text-gray-300">Efficiency Improvement</div>
+              </div>
+              
+              <div className="text-center p-6 rounded-xl bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-20">
+                <Shield className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                <div className="text-3xl font-bold text-white mb-2">100%</div>
+                <div className="text-gray-300">HIPAA Compliant</div>
               </div>
             </div>
           </div>
         </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
 
         {/* Testimonials Section */}
         <section id="testimonials" className="py-20 bg-gray-50">
@@ -965,7 +1158,10 @@ const MediCarePro = () => {
               <div>
                 <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                   <h3 className="text-2xl font-semibold text-gray-900 mb-6">Send Us a Message</h3>
-                  <form onSubmit={handleSubmit}>
+                  <form 
+                  action="https://formspree.io/f/xyzjpgon"
+                  method="Post"
+                  onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-6">
                       <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -1113,6 +1309,4 @@ const MediCarePro = () => {
       </div>
     </>
   );
-};
-
-export default MediCarePro;
+}
