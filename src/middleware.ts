@@ -16,11 +16,11 @@ export const middleware = async (req: NextRequest) => {
 
   if (!token) {
     console.log("No token")
-    return NextResponse.redirect(new URL("/sign-in", req.url))
+    return NextResponse.redirect(new URL("/signin", req.url))
   }
 
   const url = req.url
-  if (url.includes("/sign-in") && token) {
+  if (url.includes("/signin") && token) {
     return NextResponse.redirect(new URL("/dashboard", req.url))
   }
 
@@ -33,7 +33,7 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.next()
   } catch (error) {
     console.error(error)
-    return NextResponse.redirect(new URL("/sign-in", req.url))
+    return NextResponse.redirect(new URL("/signin", req.url))
   }
 }
 

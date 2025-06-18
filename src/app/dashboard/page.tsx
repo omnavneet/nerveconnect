@@ -14,6 +14,7 @@ import {
   Thermometer,
   Activity,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Patient {
   id: string
@@ -24,7 +25,7 @@ interface Patient {
   address: string
   createdAt: string
   userId: string
-  diseases?: string[]
+  diseases?: Array<string | { id: string; name: string; patientId: string }>
 }
 
 interface Appointment {
@@ -57,6 +58,19 @@ const EnhancedDoctorDashboard: React.FC = () => {
   )
   const [selectedPatientId, setSelectedPatientId] = useState("")
 
+  const [selectedAppointment, setSelectedAppointment] = useState<
+    (Appointment & { patient: Patient }) | null
+  >(null)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [AIAnalysis, setAIAnalysis] = useState<string | null>(null)
+
+  const handleAppointmentClick = (appointment: any) => {
+    setSelectedAppointment(appointment)
+    setShowDetailsModal(true)
+  }
+
+  const router = useRouter()
+
   const getAllPatients = async () => {
     try {
       setLoading(true)
@@ -81,6 +95,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
         credentials: "include",
       })
       const data = await res.json()
+      console.log(data)
       setAppointments(data)
       setLoading(false)
     } catch (err) {
@@ -155,18 +170,53 @@ const EnhancedDoctorDashboard: React.FC = () => {
     setShowAddAppointmentModal(false)
   }
 
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" })
+    router.push("/signin")
+  }
+
+  const aianalysis = async (
+    appointment: Appointment & { patient: Patient }
+  ) => {
+    try {
+      const res = await fetch(`/api/ai_analysis`, {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({ appointment }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "AI analysis failed")
+      console.log("AI Analysis Result:", data)
+      setAIAnalysis(data.result)
+    } catch (error) {
+      console.error("AI Analysis Error:", error)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Stethoscope className="h-6 w-6 text-blue-600" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Stethoscope className="h-6 w-6 text-blue-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-slate-800">
+                Doctor Dashboard
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold text-slate-800">
-              Doctor Dashboard
-            </h1>
+
+            <button
+              onClick={handleLogout}
+              className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 text-sm font-medium"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
@@ -290,7 +340,8 @@ const EnhancedDoctorDashboard: React.FC = () => {
                                 >
                                   {typeof disease === "string"
                                     ? disease
-                                    : disease.name}
+                                    : (disease as any).name ||
+                                      "Unknown Disease"}
                                 </span>
                               ))}
                             </div>
@@ -346,7 +397,8 @@ const EnhancedDoctorDashboard: React.FC = () => {
                   {appointments.map((appointment) => (
                     <div
                       key={appointment.id}
-                      className="bg-slate-50 rounded-lg p-4 hover:bg-slate-100 transition-colors duration-200"
+                      onClick={() => handleAppointmentClick(appointment)}
+                      className="bg-slate-50 rounded-lg p-4 hover:bg-slate-100 transition-colors duration-200 cursor-pointer"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
@@ -367,7 +419,10 @@ const EnhancedDoctorDashboard: React.FC = () => {
                               <span>
                                 {new Date(appointment.date).toLocaleTimeString(
                                   [],
-                                  { hour: "2-digit", minute: "2-digit" }
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
                                 )}
                               </span>
                             </span>
@@ -385,6 +440,170 @@ const EnhancedDoctorDashboard: React.FC = () => {
           </section>
         </div>
       </div>
+
+      {/* Appointment Details Modal */}
+      {showDetailsModal && selectedAppointment && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 rounded-t-xl">
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              >
+                ✕
+              </button>
+              <h2 className="text-2xl font-bold text-slate-800 pr-10">
+                {selectedAppointment.diagnosis}
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Medical Record Details
+              </p>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Patient Information */}
+              <div className="bg-slate-50 rounded-lg p-4">
+                <h3 className="font-semibold text-slate-700 mb-3 flex items-center">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                  Patient Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-sm font-medium text-slate-600">
+                      Name:
+                    </span>
+                    <p className="text-slate-800">
+                      {selectedAppointment.patient.name}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-slate-600">
+                      Age:
+                    </span>
+                    <p className="text-slate-800">
+                      {selectedAppointment.patient.age} years
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Appointment Details */}
+              <div className="bg-slate-50 rounded-lg p-4">
+                <h3 className="font-semibold text-slate-700 mb-3 flex items-center">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  Appointment Details
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-sm font-medium text-slate-600">
+                      Date & Time:
+                    </span>
+                    <p className="text-slate-800">
+                      {new Date(selectedAppointment.date).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-slate-600">
+                      Symptoms:
+                    </span>
+                    <p className="text-slate-800">
+                      {selectedAppointment.symptoms}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-slate-600">
+                      Instructions:
+                    </span>
+                    <p className="text-slate-800">
+                      {selectedAppointment.instructions}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vital Signs */}
+              <div className="bg-slate-50 rounded-lg p-4">
+                <h3 className="font-semibold text-slate-700 mb-3 flex items-center">
+                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  Vital Signs
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-lg p-3 border border-slate-200">
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                      Blood Pressure
+                    </span>
+                    <p className="text-lg font-semibold text-slate-800">
+                      {selectedAppointment.bloodPressure}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-slate-200">
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                      Heart Rate
+                    </span>
+                    <p className="text-lg font-semibold text-slate-800">
+                      {selectedAppointment.heartRate}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-slate-200">
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                      Temperature
+                    </span>
+                    <p className="text-lg font-semibold text-slate-800">
+                      {selectedAppointment.temperature}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Analysis Section */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-200">
+                <h3 className="font-semibold text-slate-700 mb-3 flex items-center">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                  AI Analysis
+                </h3>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => aianalysis(selectedAppointment)}
+                    className="w-full md:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                      />
+                    </svg>
+                    Generate AI Analysis
+                  </button>
+
+                  {/* Placeholder for AI analysis results */}
+                  <div className="bg-white rounded-lg p-4 border border-slate-200 min-h-[60px] flex items-center justify-center text-slate-400 text-sm">
+                    AI analysis will appear here
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-200">
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-4 rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Patient Modal */}
       {showAddPatientModal && (
