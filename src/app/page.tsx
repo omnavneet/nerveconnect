@@ -566,6 +566,9 @@ export default function MediCarePro() {
           </div>
         </nav>
 
+
+        
+
         {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="fixed inset-0 bg-gray-900/95 z-40 flex flex-col items-center justify-center p-4">
