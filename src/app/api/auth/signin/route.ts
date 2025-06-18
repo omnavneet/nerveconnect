@@ -1,33 +1,66 @@
-// import { PrismaClient } from "@prisma/client"
-// import { comparePasswords, createJWT } from "../../../libs/auth"
-// import { cookies } from "next/headers"
-// import { NextResponse } from "next/server"
+// src/app/api/auth/signup/route.ts
 
-// const prisma = new PrismaClient()
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcrypt';
+import { z } from 'zod';
+import { PrismaClient } from '@/generated/prisma'; 
 
-// export async function POST(req: Request) {
-//   const formData = await req.formData()
-//   const userName = formData.get("userName")?.toString() || ""
-//   const password = formData.get("password")?.toString() || ""
 
-//   const user = await prisma.user.findFirst({ where: { name: userName } })
-//   if (!user) {
-//     return NextResponse.json({ error: "User not found" }, { status: 404 })
-//   }
+const signupSchema = z.object({
+  name: z.string().min(1),
+  username: z.string().min(3),
+  email: z.string().email(),
+  password: z.string().min(6),
+});
 
-//   const isValid = await comparePasswords(password, user.password)
-//   if (!isValid) {
-//     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
-//   }
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { name, username, email, password } = signupSchema.parse(body);
 
-//   const token = createJWT(user)
-//   const cookieStore = await cookies()
-//   cookieStore.set("auth_token", token, {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === "production",
-//     path: "/",
-//     maxAge: 7 * 24 * 60 * 60,
-//   })
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
 
-//   return NextResponse.json({ token })
-// }
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User already exists with this email.' },
+        { status: 400 }
+      );
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user
+    const user = await prisma.user.create({
+      data: {
+        name,
+        username,
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    return NextResponse.json(
+      { message: 'User created successfully', user: { id: user.id, email: user.email } },
+      { status: 201 }
+    );
+  } catch (error: any) {
+    console.error('[SIGNUP_ERROR]', error);
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: error.errors },
+        { status: 422 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
