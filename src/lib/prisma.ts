@@ -1,4 +1,3 @@
-// src/lib/prisma.ts
 import { PrismaClient } from '../generated/prisma'; // <-- relative import, not alias
 
 const globalForPrisma = globalThis as unknown as {

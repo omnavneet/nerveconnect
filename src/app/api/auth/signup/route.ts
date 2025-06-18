@@ -1,29 +1,32 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
-
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+import bcrypt from "bcrypt"
+import { SignJWT } from "jose"
+import { cookies } from "next/headers"
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { name, username, email, password } = body;
+    const body = await req.json()
+    const { name, username, email, password } = body
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existing = await prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { email }],
+      },
+    })
 
-    if (existingUser) {
+    if (existing) {
       return NextResponse.json(
-        { error: 'User already exists with this email.' },
+        { error: "User already exists" },
         { status: 400 }
-      );
+      )
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create the user
+    // Create user
     const user = await prisma.user.create({
       data: {
         name,
@@ -31,20 +34,36 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
       },
-    });
-    
-    console.log(user);
+    })
+
+    const token = await new SignJWT({ _id: user.id })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET))
+
+    const cookieStore = await cookies()
+    cookieStore.set("auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+      sameSite: "lax",
+    })
+
+    console.log(token)
 
     return NextResponse.json(
-      { message: 'User created successfully', user: { id: user.id, email: user.email } },
+      {
+        message: "Signup successful",
+        user: { id: user.id, username: user.username },
+      },
       { status: 201 }
-    );
+    )
   } catch (error: any) {
-    console.error('[SIGNUP_ERROR]', error);
-
+    console.error("[SIGNUP_ERROR]", error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
-    );
+    )
   }
 }
