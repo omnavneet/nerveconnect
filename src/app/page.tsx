@@ -1161,95 +1161,12 @@ export default function MediCarePro() {
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <span className="inline-block px-4 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mb-4">
-                Pricing
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 font-serif">
-                Simple, Transparent Pricing
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Choose the plan that fits your practice's needs
-              </p>
-            </div>
+       
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {pricingPlans.map((plan, index) => (
-                <div
-                  key={index}
-                  className={`bg-white rounded-2xl p-8 ${
-                    plan.featured
-                      ? "shadow-xl border-2 border-blue-500"
-                      : "shadow-lg border border-gray-100"
-                  } transition-all duration-300 hover:-translate-y-2.5 hover:shadow-xl relative`}
-                >
-                  {plan.featured && (
-                    <div className="absolute top-0 right-0 bg-blue-500 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">
-                      Most Popular
-                    </div>
-                  )}
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                    {plan.name}
-                  </h3>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
-                  <div className="mb-6">
-                    <span className="text-5xl font-bold text-gray-900">
-                      {plan.price}
-                    </span>
-                    <span className="text-gray-600">{plan.period}</span>
-                  </div>
-                  <ul className="text-gray-600 space-y-3 mb-8">
-                    {plan.features.map((feature, i) => {
-                      if (typeof feature === "string") {
-                        return (
-                          <li key={i} className="flex items-center">
-                            <i className="fas fa-check text-blue-500 mr-2"></i>{" "}
-                            {feature}
-                          </li>
-                        )
-                      } else {
-                        return (
-                          <li
-                            key={i}
-                            className="flex items-center text-gray-400"
-                          >
-                            <i className="fas fa-times text-gray-300 mr-2"></i>{" "}
-                            <span className="line-through">{feature.text}</span>
-                          </li>
-                        )
-                      }
-                    })}
-                  </ul>
-                  <button
-                    onClick={createRipple}
-                    className={`w-full px-6 py-3 ${
-                      plan.featured
-                        ? "bg-blue-600 text-white hover:bg-blue-700"
-                        : "border border-blue-600 text-blue-600 hover:bg-blue-50"
-                    } font-semibold rounded-lg hover:shadow-lg transition-all duration-300`}
-                  >
-                    {plan.buttonText}
-                  </button>
-                </div>
-              ))}
-            </div>
 
-            <div className="text-center mt-12">
-              <p className="text-gray-600">
-                Need a custom solution?{" "}
-                <button
-                  onClick={() => scrollToSection("contact")}
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  Contact our sales team
-                </button>
-              </p>
-            </div>
-          </div>
-        </section>
+
+
+       
 
         {/* FAQ Section */}
         <section className="py-20 bg-gray-50">
