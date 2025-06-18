@@ -1,63 +1,38 @@
-// src/app/api/auth/signup/route.ts
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import { z } from 'zod';
-import { PrismaClient } from '@/generated/prisma'; 
-
-
-const signupSchema = z.object({
-  name: z.string().min(1),
-  username: z.string().min(3),
-  email: z.string().email(),
-  password: z.string().min(6),
-});
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, username, email, password } = signupSchema.parse(body);
+    const { username, password } = body;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    const user = await prisma.user.findUnique({
+      where: { username },
     });
 
-    if (existingUser) {
+    if (!user) {
       return NextResponse.json(
-        { error: 'User already exists with this email.' },
-        { status: 400 }
+        { error: 'Invalid username or password' },
+        { status: 401 }
       );
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-    // Create the user
-    const user = await prisma.user.create({
-      data: {
-        name,
-        username,
-        email,
-        password: hashedPassword,
-      },
-    });
+    if (!isPasswordCorrect) {
+      return NextResponse.json(
+        { error: 'Invalid username or password' },
+        { status: 401 }
+      );
+    }
 
     return NextResponse.json(
-      { message: 'User created successfully', user: { id: user.id, email: user.email } },
-      { status: 201 }
+      { message: 'Login successful', user: { id: user.id, username: user.username } },
+      { status: 200 }
     );
-  } catch (error: any) {
-    console.error('[SIGNUP_ERROR]', error);
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid input', details: error.errors },
-        { status: 422 }
-      );
-    }
-
+  } catch (error) {
+    console.error('[SIGNIN_ERROR]', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
