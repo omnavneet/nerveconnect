@@ -874,11 +874,10 @@ export default function MediCarePro() {
                       </div>
                     </button>
                   </div>
-                  <img
-                    src="https://via.placeholder.com/800x450?text=MediCare+Pro+Demo"
-                    alt="Product Demo"
-                    className="w-full h-full object-cover"
-                  />
+                  <video width="640" height="360" controls>
+  <source src="C:\Users\HP\Videos\Captures\Create Next App - Google Chrome 2025-06-20 02-41-04.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
                 </div>
               </div>
             </div>
