@@ -26,7 +26,6 @@ import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-
 interface PricingPlanFeature {
   text: string
   included: boolean
@@ -83,10 +82,9 @@ export default function MediCarePro() {
     patients: 0,
     uptime: 0,
     support: 0,
-
   })
 
-  const router=useRouter()
+  const router = useRouter()
 
   // Refs
   const navRef = useRef<HTMLElement>(null)
@@ -221,7 +219,6 @@ export default function MediCarePro() {
   }
 
   const createRipple = (e: React.MouseEvent) => {
-   
     router.push("/demo")
   }
 
@@ -520,12 +517,13 @@ export default function MediCarePro() {
 
               <div className="flex space-x-4">
                 <Link
-                href={'/check_signin'} 
-                className="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium">
+                  href={"/check_signin"}
+                  className="px-4 py-2 text-white border border-white/30 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                >
                   Login
                 </Link>
                 <Link
-                  href={'/check_signup'}
+                  href={"/check_signup"}
                   className="px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium"
                 >
                   Get Started
@@ -554,9 +552,6 @@ export default function MediCarePro() {
             </div>
           </div>
         </nav>
-
-
-        
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
@@ -874,11 +869,13 @@ export default function MediCarePro() {
                       </div>
                     </button>
                   </div>
-                  <img
-                    src="https://via.placeholder.com/800x450?text=MediCare+Pro+Demo"
-                    alt="Product Demo"
-                    className="w-full h-full object-cover"
-                  />
+                  <video width="640" height="360" controls>
+                    <source
+                      src="C:\Users\HP\Videos\Captures\Create Next App - Google Chrome 2025-06-20 02-41-04.mp4"
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
               </div>
             </div>
@@ -1150,13 +1147,6 @@ export default function MediCarePro() {
           </div>
         </section>
 
-       
-
-
-
-
-       
-
         {/* FAQ Section */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1236,7 +1226,7 @@ export default function MediCarePro() {
                 onClick={createRipple}
                 className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                <i className="fas fa-calendar-alt"></i> 
+                <i className="fas fa-calendar-alt"></i>
                 <Link href={"/demo"}>Schedule a Demo</Link>
               </button>
             </div>
