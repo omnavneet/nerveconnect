@@ -27,11 +27,15 @@ Vitals:
 - Oxygen Saturation: {oxygenSaturation}
 
 1. Briefly summarize the case.
-2. Explain any risks or concerns.
+2. Provide additional medical information including:
+   - Recommended medicines
+   - Dosages and frequency
+   - Any lifestyle or dietary advice
+   - An AI-generated prescription suitable for the case
+
 3. Provide a final judgment: "Normal", "Monitor", or "Critical".
 
-{format_instructions}
-`
+{format_instructions}`
 
 export async function getAIAnalysis(appointment: any): Promise<any> {
   try {
@@ -43,6 +47,7 @@ export async function getAIAnalysis(appointment: any): Promise<any> {
 
     const formatInstructions = appointmentAnalysisParser.getFormatInstructions()
     const prompt = PromptTemplate.fromTemplate(templateString)
+    appointment = appointment.appointment
 
     const chain = RunnableSequence.from([
       {
@@ -61,6 +66,7 @@ export async function getAIAnalysis(appointment: any): Promise<any> {
       model,
       async (response) => {
         try {
+          console.log("Model response:", response.content)
           return await appointmentAnalysisParser.parse(response.content)
         } catch (error) {
           console.error("Parsing error:", error)

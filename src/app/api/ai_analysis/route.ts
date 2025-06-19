@@ -6,7 +6,6 @@ export async function POST(req: Request) {
     const appointment = await req.json()
 
     const result = await getAIAnalysis(appointment)
-    console.log("AI Analysis Result:", result)
 
     return NextResponse.json({ result })
   } catch (error) {

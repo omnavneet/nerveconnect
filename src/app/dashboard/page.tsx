@@ -13,6 +13,8 @@ import {
   Heart,
   Thermometer,
   Activity,
+  Bell,
+  Settings,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -40,6 +42,11 @@ interface Appointment {
   instructions?: string
   followUpInDays?: number
   patientId: string
+  aiAnalysis?: {
+    summary: string
+    judgment: string
+    reason: string
+  }
 }
 
 const EnhancedDoctorDashboard: React.FC = () => {
@@ -62,7 +69,14 @@ const EnhancedDoctorDashboard: React.FC = () => {
     (Appointment & { patient: Patient }) | null
   >(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
-  const [AIAnalysis, setAIAnalysis] = useState<string | null>(null)
+  const [AIAnalysis, setAIAnalysis] = useState<{
+    summary: string
+    judgment: string
+    reason: string
+  } | null>(null)
+
+  const [userName, setUserName] = useState<string | null>(null)
+  const [count, setCount] = useState<number>(0)
 
   const handleAppointmentClick = (appointment: any) => {
     setSelectedAppointment(appointment)
@@ -71,6 +85,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
 
   const router = useRouter()
 
+  // Fetch all patients
   const getAllPatients = async () => {
     try {
       setLoading(true)
@@ -87,6 +102,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
     }
   }
 
+  // Fetch all appointments
   const getAllAppointments = async () => {
     try {
       setLoading(true)
@@ -95,7 +111,6 @@ const EnhancedDoctorDashboard: React.FC = () => {
         credentials: "include",
       })
       const data = await res.json()
-      console.log(data)
       setAppointments(data)
       setLoading(false)
     } catch (err) {
@@ -109,6 +124,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
     getAllAppointments()
   }, [])
 
+  // New Patient Function
   const submitPatient = async (e: React.FormEvent) => {
     e.preventDefault()
     const diseasesArray = diseasesInput
@@ -141,6 +157,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
     setShowAddPatientModal(false)
   }
 
+  // New Appointment Function
   const submitAppointment = async (e: React.FormEvent) => {
     e.preventDefault()
     const payload = {
@@ -175,6 +192,43 @@ const EnhancedDoctorDashboard: React.FC = () => {
     router.push("/signin")
   }
 
+  // Get current username
+  const getCurrentUser = async () => {
+    try {
+      const res = await fetch("/api/auth/current", {
+        method: "GET",
+        credentials: "include",
+      })
+      const data = await res.json()
+      setUserName(data.username)
+    } catch (error) {
+      console.error("Error fetching current user:", error)
+    }
+  }
+
+  useEffect(() => {
+    getCurrentUser()
+  }, [])
+
+  // Fetch today's appointment count
+  useEffect(() => {
+    const fetchTodayCount = async () => {
+      try {
+        const res = await fetch("/api/appointment/today", {
+          method: "GET",
+          credentials: "include",
+        })
+        const data = await res.json()
+        setCount(data.count || 0)
+      } catch (error) {
+        console.error("Error fetching today's appointments:", error)
+      }
+    }
+
+    fetchTodayCount()
+  }, [])
+
+  // AI Analysis Function
   const aianalysis = async (
     appointment: Appointment & { patient: Patient }
   ) => {
@@ -189,8 +243,21 @@ const EnhancedDoctorDashboard: React.FC = () => {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "AI analysis failed")
-      console.log("AI Analysis Result:", data)
+
+      console.log("AI Analysis Result:", data.result)
+      console.log("Appointment ID:", appointment.id)
+
+      await fetch("/api/appointment/aiAnalysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId: appointment.id,
+          aiAnalysis: data.result,
+        }),
+      })
+
       setAIAnalysis(data.result)
+      console.log(AIAnalysis)
     } catch (error) {
       console.error("AI Analysis Error:", error)
     }
@@ -199,24 +266,31 @@ const EnhancedDoctorDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-100 shadow-lg border-b border-blue-200">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Stethoscope className="h-6 w-6 text-blue-600" />
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
+                <Stethoscope className="h-7 w-7 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-800">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-blue-700 bg-clip-text text-transparent">
                 Doctor Dashboard
               </h1>
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 text-sm font-medium"
-            >
-              Logout
-            </button>
+            <div className="flex items-center space-x-4">
+              {userName && (
+                <p className="text-base text-slate-700 font-semibold bg-white px-4 py-2 rounded-lg shadow-sm">
+                  Dr. {userName}
+                </p>
+              )}
+              <button
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -262,7 +336,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
                 <p className="text-sm font-medium text-slate-600">
                   Today's Schedule
                 </p>
-                <p className="text-3xl font-bold text-slate-900">8</p>
+                <p className="text-3xl font-bold text-slate-900">{count}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Clock className="h-6 w-6 text-purple-600" />
@@ -547,6 +621,14 @@ const EnhancedDoctorDashboard: React.FC = () => {
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-slate-200">
                     <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                      Oxygen Saturation
+                    </span>
+                    <p className="text-lg font-semibold text-slate-800">
+                      {selectedAppointment.oxygenSaturation}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-slate-200">
+                    <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
                       Temperature
                     </span>
                     <p className="text-lg font-semibold text-slate-800">
@@ -584,10 +666,34 @@ const EnhancedDoctorDashboard: React.FC = () => {
                     Generate AI Analysis
                   </button>
 
-                  {/* Placeholder for AI analysis results */}
-                  <div className="bg-white rounded-lg p-4 border border-slate-200 min-h-[60px] flex items-center justify-center text-slate-400 text-sm">
-                    AI analysis will appear here
-                  </div>
+                  {AIAnalysis ? (
+                    <div className="bg-white rounded-lg p-4 border border-slate-200 text-slate-800 space-y-2">
+                      <div>
+                        <span className="font-semibold">Summary:</span>{" "}
+                        {AIAnalysis.summary}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Judgment:</span>{" "}
+                        <span
+                          className={`font-medium px-2 py-1 rounded-md ${
+                            AIAnalysis.judgment === "Normal"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {AIAnalysis?.judgment as string}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="font-semibold">Reason:</span>{" "}
+                        {AIAnalysis?.reason as string}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-lg p-4 border border-slate-200 min-h-[60px] flex items-center justify-center text-slate-400 text-sm">
+                      AI analysis will appear here
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -859,6 +965,24 @@ const EnhancedDoctorDashboard: React.FC = () => {
                   }
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Oxygen Saturation (%)
+              </label>
+              <input
+                type="number"
+                className="w-full border border-slate-300 rounded-lg px-3 py-2"
+                placeholder="95"
+                value={appointmentData.oxygenSaturation || ""}
+                onChange={(e) =>
+                  setAppointmentData({
+                    ...appointmentData,
+                    oxygenSaturation: Number(e.target.value),
+                  })
+                }
+              />
             </div>
 
             <div>

@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "./prisma/generated/client"
 }
 
 datasource db {
@@ -51,6 +50,7 @@ model Appointment {
   followUpInDays Int?
   patient     Patient   @relation(fields: [patientId], references: [id])
   patientId   String
+  aiAnalysis Json?
 }
 
 model Disease {
