@@ -24,6 +24,8 @@ import {
 } from "recharts"
 import Head from "next/head"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+
 
 interface PricingPlanFeature {
   text: string
@@ -81,7 +83,10 @@ export default function MediCarePro() {
     patients: 0,
     uptime: 0,
     support: 0,
+
   })
+
+  const router=useRouter()
 
   // Refs
   const navRef = useRef<HTMLElement>(null)
@@ -216,24 +221,8 @@ export default function MediCarePro() {
   }
 
   const createRipple = (e: React.MouseEvent) => {
-    const button = e.currentTarget
-    const ripple = document.createElement("span")
-    ripple.className = "ripple"
-
-    const rect = button.getBoundingClientRect()
-    const size = Math.max(rect.width, rect.height)
-    const x = e.clientX - rect.left - size / 2
-    const y = e.clientY - rect.top - size / 2
-
-    ripple.style.width = ripple.style.height = `${size}px`
-    ripple.style.left = `${x}px`
-    ripple.style.top = `${y}px`
-
-    button.appendChild(ripple)
-
-    setTimeout(() => {
-      ripple.remove()
-    }, 600)
+   
+    router.push("/demo")
   }
 
   const scrollToSection = (id: string) => {
@@ -1247,7 +1236,8 @@ export default function MediCarePro() {
                 onClick={createRipple}
                 className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                <i className="fas fa-calendar-alt"></i> Schedule a Demo
+                <i className="fas fa-calendar-alt"></i> 
+                <Link href={"/demo"}>Schedule a Demo</Link>
               </button>
             </div>
           </div>
