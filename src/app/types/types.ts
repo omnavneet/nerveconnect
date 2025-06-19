@@ -1,72 +1,132 @@
-// Patient type
-export interface Patient {
-  id: number;
+
+
+// Base interface for common fields
+interface BaseEntity {
+  id: string;
+  createdAt: Date;
+}
+
+// User Model
+export interface User extends BaseEntity {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  patients?: Patient[]; // Optional relation
+}
+
+// Patient Model
+export interface Patient extends BaseEntity {
   name: string;
   age: number;
-  diagnosis: string;
-  history: string;
-  symptoms: string;
-  lastVisit: string;
   phone: string;
+  email: string;
+  address: string;
+  userId: string;
+  user?: User; // Optional relation
+  appointments?: Appointment[];
+  diseases?: Disease[];
 }
 
-// Appointment type
-export interface Appointment {
-  id: number;
-  patientName: string;
-  time: string;
-  date: string;
-  type: string;
+// Appointment Model
+export interface Appointment extends BaseEntity {
+  date: Date;
+  diagnosis: string;
+  symptoms: string;
+  temperature?: number | null;
+  bloodPressure?: string | null;
+  heartRate?: number | null;
+  oxygenSaturation?: number | null;
+  instructions?: string | null;
+  followUpInDays?: number | null;
+  patientId: string;
+  patient?: Patient; // Optional relation
+  aiAnalysis?: any; // Using any for Json type, consider more specific typing
 }
 
-// Prescription type
-export interface Prescription {
-  patientName: string;
-  date: string;
-  doctorName: string;
-  medications: string[];
-  instructions: string;
-  followUp: string;
+// Disease Model
+export interface Disease extends BaseEntity {
+  name: string;
+  patientId: string;
+  patient?: Patient; // Optional relation
 }
 
-// Mock Patients
-export const mockPatients: Patient[] = [
-  {
-    id: 1,
-    name: "John Smith",
-    age: 45,
-    diagnosis: "Hypertension",
-    history: "Previous heart condition, family history of diabetes",
-    symptoms: "Chest pain, shortness of breath",
-    lastVisit: "2024-06-10",
-    phone: "+1-555-0123",
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    age: 32,
-    diagnosis: "Migraine",
-    history: "Chronic headaches, stress-related symptoms",
-    symptoms: "Severe headache, nausea, light sensitivity",
-    lastVisit: "2024-06-12",
-    phone: "+1-555-0124",
-  },
-];
+// Voice Patient Model
+export interface voicePatient extends BaseEntity {
+  name: string;
+  voiceAppointments?: voiceAppointment[]; // Optional relation
+}
 
-// Mock Appointments
-export const mockAppointments: Appointment[] = [
-  {
-    id: 1,
-    patientName: "Alice Brown",
-    time: "10:00 AM",
-    date: "2024-06-15",
-    type: "Consultation",
-  },
-  {
-    id: 2,
-    patientName: "Bob Davis",
-    time: "2:30 PM",
-    date: "2024-06-15",
-    type: "Follow-up",
-  },
-];
+// Voice Doctor Model
+export interface voiceDoctor extends BaseEntity {
+  name: string;
+  voiceAppointments?: voiceAppointment[]; // Optional relation
+}
+
+// Voice Appointment Model
+export interface voiceAppointment extends BaseEntity {
+  date: Date;
+  patientId: string;
+  doctorId: string;
+  patient?: voicePatient; // Optional relation
+  doctor?: voiceDoctor; // Optional relation
+}
+
+// Create DTOs (for creating new entities)
+export interface CreateUser {
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface CreatePatient {
+  name: string;
+  age: number;
+  phone: string;
+  email: string;
+  address: string;
+  userId: string;
+}
+
+export interface CreateAppointment {
+  date: Date;
+  diagnosis: string;
+  symptoms: string;
+  temperature?: number;
+  bloodPressure?: string;
+  heartRate?: number;
+  oxygenSaturation?: number;
+  instructions?: string;
+  followUpInDays?: number;
+  patientId: string;
+  aiAnalysis?: any;
+}
+
+export interface CreateDisease {
+  name: string;
+  patientId: string;
+}
+
+export interface CreateVoicePatient {
+  name: string;
+}
+
+export interface CreateVoiceDoctor {
+  name: string;
+}
+
+export interface CreateVoiceAppointment {
+  date: Date;
+  patientId: string;
+  doctorId: string;
+}
+
+// Update DTOs (for partial updates)
+export type UpdateUser = Partial<CreateUser>;
+export type UpdatePatient = Partial<CreatePatient>;
+export type UpdateAppointment = Partial<CreateAppointment>;
+export type UpdateDisease = Partial<CreateDisease>;
+export type UpdateVoicePatient = Partial<CreateVoicePatient>;
+export type UpdateVoiceDoctor = Partial<CreateVoiceDoctor>;
+export type UpdateVoiceAppointment = Partial<CreateVoiceAppointment>;

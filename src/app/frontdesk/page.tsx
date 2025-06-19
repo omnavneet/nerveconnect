@@ -81,14 +81,31 @@ const HospitalVoiceBot = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleSpeechResult = (text) => {
-    console.log('Processing speech:', text);
-    // Here you would typically send the text to your backend
-    // For now, we'll just simulate a response
-    setTimeout(() => {
-      speakResponse(`I heard you say: ${text}. How can I help you with that?`);
-    }, 1000);
-  };
+  const handleSpeechResult = async (text) => {
+  console.log("Processing speech:", text);
+
+  const res = await fetch('/api/parse', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transcript: text }),
+  });
+
+  const { details } = await res.json();
+
+  if (!details || !details.patientName || !details.doctorName || !details.datetime) {
+    speakResponse("Sorry, I couldn't understand the details clearly. Please try again.");
+    return;
+  }
+
+  const appointmentRes = await fetch('/api/appointment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(details),
+  });
+
+  const result = await appointmentRes.json();
+  speakResponse(result.message || "Something went wrong while scheduling.");
+};
 
   const speakResponse = (text) => {
     if (synthRef.current && isSupported) {

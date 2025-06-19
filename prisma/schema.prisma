@@ -59,3 +59,25 @@ model Disease {
   patient   Patient  @relation(fields: [patientId], references: [id])
   patientId String
 }
+
+model VoicePatient {
+  id               String               @id @default(uuid())
+  name             String
+  voiceAppointments VoiceAppointment[]
+}
+
+model VoiceDoctor {
+  id               String               @id @default(uuid())
+  name             String
+  voiceAppointments VoiceAppointment[]
+}
+
+model VoiceAppointment {
+  id         String        @id @default(uuid())
+  patient    VoicePatient  @relation(fields: [patientId], references: [id])
+  patientId  String
+  doctor     VoiceDoctor   @relation(fields: [doctorId], references: [id])
+  doctorId   String
+  date       DateTime
+  createdAt  DateTime      @default(now())
+}
