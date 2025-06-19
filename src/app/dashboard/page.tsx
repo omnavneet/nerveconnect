@@ -924,8 +924,8 @@ const EnhancedDoctorDashboard: React.FC = () => {
 
       {/* Appointment Details Modal */}
       {showDetailsModal && selectedAppointment && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center min-h-screen p-2 sm:p-6">
-          <div className="bg-white/80 backdrop-blur-2xl rounded-3xl w-full max-w-6xl shadow-md relative max-h-[90vh] flex flex-col border border-gray-200">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white/80 backdrop-blur-2xl rounded-3xl w-full max-w-6xl shadow-md relative h-[calc(100vh-32px)] flex flex-col border border-gray-200">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 rounded-t-3xl relative shrink-0">
               <button
@@ -943,7 +943,7 @@ const EnhancedDoctorDashboard: React.FC = () => {
             </div>
 
             {/* Content - Two Column Layout */}
-            <div className="overflow-y-auto max-h-[calc(90vh-120px)] flex-1 bg-red-50">
+            <div className="overflow-y-auto flex-1">
               <div className="p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Left Column */}
@@ -1200,16 +1200,6 @@ const EnhancedDoctorDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="border-t bg-gray-50/80 p-6 rounded-b-3xl shrink-0">
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="w-84 bg-gray-700 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-xl transition-colors text-lg shadow-md"
-              >
-                Close Medical Record
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -1351,12 +1341,12 @@ const EnhancedDoctorDashboard: React.FC = () => {
 
       {/* Add Appointment Modal */}
       {showAddAppointmentModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center min-h-screen p-2 sm:p-6">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <form
             onSubmit={submitAppointment}
-            className="bg-white/90 backdrop-blur-2xl w-full max-w-lg rounded-3xl p-8 shadow-md space-y-6 border border-gray-200 max-h-[90vh] flex flex-col"
+            className="bg-white/90 backdrop-blur-2xl w-full max-w-lg rounded-3xl shadow-md border border-gray-200 h-[calc(100vh-32px)] flex flex-col overflow-hidden"
           >
-            <div className="flex justify-between items-center border-b border-gray-100 pb-6 bg-gradient-to-r from-green-50 to-teal-50 rounded-t-3xl shrink-0">
+            <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-green-50 to-teal-50 rounded-t-3xl shrink-0">
               <h2 className="text-2xl font-bold text-gray-900">
                 New Appointment
               </h2>
@@ -1367,7 +1357,8 @@ const EnhancedDoctorDashboard: React.FC = () => {
                 <X className="h-6 w-6 text-gray-600" />
               </button>
             </div>
-            <div className="overflow-y-auto flex-1 w-full">
+            
+            <div className="p-8 space-y-6 overflow-y-auto flex-1">
               <div>
                 <label className="block text-base font-semibold text-gray-900 mb-2">
                   Date & Time
@@ -1530,20 +1521,23 @@ const EnhancedDoctorDashboard: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-end space-x-4 pt-6 shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowAddAppointmentModal(false)}
-                className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200 text-lg font-semibold shadow-md"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors duration-200 text-lg font-semibold shadow-md"
-              >
-                Save Appointment
-              </button>
+
+            <div className="p-8 border-t border-gray-100 bg-gradient-to-r from-green-50 to-teal-50 rounded-b-3xl shrink-0">
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddAppointmentModal(false)}
+                  className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200 text-lg font-semibold shadow-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors duration-200 text-lg font-semibold shadow-md"
+                >
+                  Save Appointment
+                </button>
+              </div>
             </div>
           </form>
         </div>
