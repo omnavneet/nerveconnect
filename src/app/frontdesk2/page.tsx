@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 
 // Define types
 type AppointmentType = "Consultation" | "Follow-up" | "Check-up" | "Emergency"
@@ -48,13 +49,8 @@ declare global {
   }
 }
 
-interface FrontDeskDashboardProps {
-  onLogout: () => void
-}
-
-const FrontDeskDashboard: React.FC<FrontDeskDashboardProps> = ({
-  onLogout,
-}) => {
+const FrontDeskDashboard: React.FC = () => {
+  const router = useRouter()
   const [isRecording, setIsRecording] = useState<boolean>(false)
   const [transcript, setTranscript] = useState<string>("")
   const [appointments, setAppointments] =
@@ -71,6 +67,11 @@ const FrontDeskDashboard: React.FC<FrontDeskDashboardProps> = ({
     })
 
   const recognitionRef = useRef<any>(null)
+
+  const handleLogout = () => {
+    // Add any logout logic here (clear session, etc.)
+    router.push('/signin')
+  }
 
   useEffect(() => {
     const checkRecognitionSupport = () => {
@@ -205,7 +206,7 @@ const FrontDeskDashboard: React.FC<FrontDeskDashboardProps> = ({
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">Reception</span>
               <button
-                onClick={onLogout}
+                onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200"
               >
                 Logout

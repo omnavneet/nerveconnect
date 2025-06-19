@@ -29,19 +29,27 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create or find patient
-    const patient = await prisma.voicePatient.upsert({
-      where: { id: patientName },
-      update: {},
-      create: { name: patientName },
+    // Find or create patient
+    let patient = await prisma.voicePatient.findFirst({
+      where: { name: patientName },
     });
+    
+    if (!patient) {
+      patient = await prisma.voicePatient.create({
+        data: { name: patientName },
+      });
+    }
 
-    // Create or find doctor
-    const doctor = await prisma.voiceDoctor.upsert({
-      where: { id: doctorName },
-      update: {},
-      create: { name: doctorName },
+    // Find or create doctor
+    let doctor = await prisma.voiceDoctor.findFirst({
+      where: { name: doctorName },
     });
+    
+    if (!doctor) {
+      doctor = await prisma.voiceDoctor.create({
+        data: { name: doctorName },
+      });
+    }
 
     // Check doctor availability
     const existingAppointments = await prisma.voiceAppointment.findMany({

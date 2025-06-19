@@ -25,7 +25,7 @@ export const middleware = async (req: NextRequest) => {
   }
 
   try {
-    const { payload } = await jwtVerify(
+    await jwtVerify(
       token,
       new TextEncoder().encode(process.env.JWT_SECRET!)
     )
