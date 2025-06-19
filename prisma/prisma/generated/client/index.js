@@ -166,7 +166,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Navneet\\Desktop\\Utility\\JUNE\\NerveConnect\\prisma\\prisma\\generated\\client",
+      "value": "C:\\Users\\HP\\Desktop\\keen\\nerveconnnect\\prisma\\prisma\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -180,7 +180,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Navneet\\Desktop\\Utility\\JUNE\\NerveConnect\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\HP\\Desktop\\keen\\nerveconnnect\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

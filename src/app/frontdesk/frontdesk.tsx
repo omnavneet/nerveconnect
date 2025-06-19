@@ -9,6 +9,7 @@ interface Appointment {
   date: string;
   time: string;
   type: AppointmentType;
+  status: 'completed' | 'in-progress' | 'scheduled' | 'confirmed'; // Add status
 }
 
 interface CurrentAppointment {
@@ -25,15 +26,17 @@ const mockAppointments: Appointment[] = [
     patientName: 'John Doe',
     date: '2023-06-15',
     time: '10:00 AM',
-    type: 'Consultation'
+    type: 'Consultation',
+    status: 'confirmed', // Add status
   },
   {
     id: 2,
     patientName: 'Jane Smith',
     date: '2023-06-15',
     time: '11:30 AM',
-    type: 'Follow-up'
-  }
+    type: 'Follow-up',
+    status: 'scheduled', // Add status
+  },
 ];
 
 declare global {

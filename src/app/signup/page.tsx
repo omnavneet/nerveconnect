@@ -389,8 +389,8 @@ function SignUpForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:shadow-xl animate-fade-in animate-glow"
-                style={{ animationDelay: "0.8s" }}
+                className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:shadow-xl animate-fade-in animate-glow visible block"
+                style={{ animationDelay: "0.8s", visibility: "visible", display: "block" }}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
@@ -625,9 +625,16 @@ function SignUpForm() {
         .animate-spin-slow {
           animation: spin-slow 3s linear infinite;
         }
+
+        /* Ensure button is always visible */
+        .visible {
+          visibility: visible !important;
+          display: block !important;
+          opacity: 1 !important;
+        }
       `}</style>
     </div>
   )
 }
 
-export default SignUpForm
+export default SignUpForm;

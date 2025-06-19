@@ -1245,12 +1245,6 @@ export default function MediCarePro() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={createRipple}
-                className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2"
-              >
-                <i className="fas fa-rocket"></i> Start Your Free Trial
-              </button>
-              <button
-                onClick={createRipple}
                 className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <i className="fas fa-calendar-alt"></i> Schedule a Demo

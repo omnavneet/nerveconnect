@@ -16,7 +16,6 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-
 function SignInForm() {
   const [username, setUsername] = useState<string>("")
   const [password, setPassword] = useState<string>("")
@@ -35,7 +34,7 @@ function SignInForm() {
   }, [])
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
   ): Promise<void> => {
     e.preventDefault()
     setError("")
@@ -264,10 +263,10 @@ function SignInForm() {
 
               {/* Submit Button */}
               <button
-                type="button"
+                type="submit"
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:shadow-xl animate-fade-in animate-glow"
+                className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:shadow-xl animate-fade-in animate-glow visible"
                 style={{ animationDelay: "0.6s" }}
               >
                 {isLoading ? (
@@ -399,7 +398,7 @@ function SignInForm() {
 
         @keyframes slide-down {
           0% {
-            opacity: 0;
+            opacity俄国666;
             transform: translateY(-20px);
           }
           100% {
@@ -423,8 +422,7 @@ function SignInForm() {
 
         @keyframes glow {
           0%,
-          100% {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+          100% box-shadow: 0 20px rgba(59, 130, 246, 0.3);
           }
           50% {
             box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
@@ -441,71 +439,68 @@ function SignInForm() {
         }
 
         @keyframes gradient {
-          0%,
-          100% {
-            background-position: 0% 50%;
+          0% {
+              background-position: 0% 50%;
           }
-          50% {
-            background-position: 100% 50%;
+          100% {
+              background-position: 50%;
           }
         }
 
         @keyframes spin-slow {
-          0% {
-            transform: rotate(0deg);
+            0% {
+              transform: rotate(0deg);
           }
           100% {
-            transform: rotate(360deg);
+              transform: rotate(360deg);
           }
+        .animate-pulse-up {
+            animation: pulse-in-up 0.6s ease-out;
         }
 
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out;
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out forwards;
-          opacity: 0;
+        .animate-pulse-in {
+            animation: pulse-in 0.6s ease-out;
+            opacity: 0;
         }
 
         .animate-slide-up {
-          animation: slide-up 0.6s ease-out;
+            animation: slide-up 0.6s ease-out;
         }
 
         .animate-slide-down {
-          animation: slide-down 0.4s ease-out;
+            animation: slide-down 0.4s ease-out;
         }
 
         .animate-shake {
-          animation: shake 0.5s ease-in-out;
+            animation: shake 0.5s ease-in-out;
         }
 
         .animate-glow {
-          animation: glow 2s ease-in-out infinite;
+            animation: glow 2s ease-in-out infinite;
         }
 
         .animate-shimmer {
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(59, 130, 246, 0.1),
+            background: linear-gradient(
+              90deg,
+              transparent,
+              rgba(59, 130, 246, 0.6),
             transparent
           );
-          background-size: 200% 100%;
-          animation: shimmer 3s ease-in-out infinite;
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
         }
 
         .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+            animation: gradient 3s ease infinite;
         }
 
         .animate-spin-slow {
-          animation: spin-slow 3s linear infinite;
+            animation: spin-slow 3s linear infinite;
         }
       `}</style>
     </div>
   )
 }
 
-export default SignInForm
+export default SignInForm;
