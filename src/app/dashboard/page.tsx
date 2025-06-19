@@ -460,10 +460,18 @@ const EnhancedDoctorDashboard: React.FC = () => {
               </div>
               
               <div className="flex items-center space-x-2">
+                
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center transition-transform hover:scale-110">
                   <User className="h-5 w-5 text-white" />
                 </div>
+
                 <span className="text-gray-900 font-medium">Dr. {userName}</span>
+                <button
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+              >
+                Logout
+              </button>
               </div>
             </div>
           </div>
