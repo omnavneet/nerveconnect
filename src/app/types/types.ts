@@ -51,16 +51,15 @@ export interface Disease extends BaseEntity {
   patient?: Patient; // Optional relation
 }
 
-// Voice Patient Model
 export interface voicePatient extends BaseEntity {
   name: string;
-  voiceAppointments?: voiceAppointment[]; // Optional relation
+  voiceAppointments?: voiceAppointment[]; 
 }
 
 // Voice Doctor Model
 export interface voiceDoctor extends BaseEntity {
   name: string;
-  voiceAppointments?: voiceAppointment[]; // Optional relation
+  voiceAppointments?: voiceAppointment[];
 }
 
 // Voice Appointment Model
