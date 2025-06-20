@@ -1,6 +1,7 @@
-import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { createPrismaClient } from "@/lib/prisma"
 
+const prisma = createPrismaClient()
 export async function POST(req: Request) {
   try {
     const { appointmentId, aiAnalysis } = await req.json()

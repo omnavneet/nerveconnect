@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 import { jwtVerify } from "jose"
+import { createPrismaClient } from "@/lib/prisma"
 
+const prisma = createPrismaClient()
 export async function POST(req: Request) {
   try {
     const cookieHeader = await cookies()

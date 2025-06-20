@@ -1,7 +1,8 @@
-import { prisma } from '@/lib/prisma';
 import { isTimeConflict } from '@/app/utils/timeUtils';
 import { NextResponse } from 'next/server';
+import { createPrismaClient } from "@/lib/prisma"
 
+const prisma = createPrismaClient()
 interface AppointmentRequest {
   patientName: string;
   doctorName: string;
