@@ -869,6 +869,7 @@ export default function MediCarePro() {
                       </div>
                     </button>
                   </div>
+                  
                   <video width="640" height="360" controls>
                     <source
                       src="C:\Users\HP\Videos\Captures\Create Next App - Google Chrome 2025-06-20 02-41-04.mp4"
@@ -876,6 +877,7 @@ export default function MediCarePro() {
                     />
                     Your browser does not support the video tag.
                   </video>
+
                 </div>
               </div>
             </div>
